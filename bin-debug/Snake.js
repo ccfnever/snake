@@ -38,6 +38,56 @@ var Snake = (function (_super) {
     p.move = function (e, during) {
         var mx = e.stageX;
         var my = e.stageY;
+        var tween;
+        for (var i = this.bodyList.length - 1; i > 0; i--) {
+            var element = array[i];
+            tween = egret.Tween.get(this.bodyList[i]);
+            tween.to({ x: this.bodyList[i - 1].x, y: this.bodyList[i - 1].y }, during);
+        }
+        var hx = this.x + this.bodyList[0].x;
+        var hy = this.y + this.bodyList[0].y;
+        //设置当前缓动对象为蛇头
+        tween = egret.Tween.get(this.bodyList[0]);
+        var tmpx, tmpy;
+        if (hx == mx && hy == my) {
+            //位置相同
+            return;
+        }
+        if (hx != mx) {
+            //非垂直
+            //斜率
+            var mk = (my - hy) / (mx - hx);
+            //角度
+            var mangle = Math.atan(mk);
+            if (mx < hx) {
+                //左边
+                tmpx = this.bodyList[0].x - this.speed * Math.cos(mangle);
+                tmpy = this.bodyList[0].y - this.speed * Math.sin(mangle);
+                tween.to({ x: tmpx, y: tmpy }, during);
+            }
+            else {
+                //右边
+                tmpx = this.bodyList[0].x + this.speed * Math.cos(mangle);
+                tmpy = this.bodyList[0].y + this.speed * Math.sin(mangle);
+                tween.to({ x: tmpx, y: tmpy }, during);
+            }
+        }
+        else {
+            //垂直
+            if (mx < hx) {
+                //水平向左
+                tmpx = this.bodyList[0].x - this.speed;
+                tween.to({ x: tmpx, y: tmpy }, during);
+            }
+            else {
+                //水平向右
+                tmpx = this.bodyList[0].x + this.speed;
+                tween.to({ x: tmpx, y: tmpy }, during);
+            }
+        }
+    };
+    p.getHead = function () {
+        return this.bodyList[0];
     };
     return Snake;
 }(egret.Sprite));
