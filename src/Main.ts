@@ -112,6 +112,13 @@ class Main extends egret.DisplayObjectContainer {
 
     private textfield:egret.TextField;
 
+    private food:Food;
+    private snake:Snake;
+    private stageW:number;
+    private stageH:number;
+    private radius:number = 30;
+
+
     /**
      * 创建游戏场景
      * Create a game scene
@@ -129,14 +136,22 @@ class Main extends egret.DisplayObjectContainer {
         
         this.createFood();
 
+        this.snake = new Snake(this.stageW * 0.5, this.stageH * 0.5, this.radius,0x33ffcc);
+        this.addChild(this.snake);
         this.touchEnabled = true;
-        // this.addEventListener(egret.TouchEvent.TOUCH_TAP,this.move,this);
+        this.addEventListener(egret.TouchEvent.TOUCH_TAP,this.move,this);
+        this.addEventListener(egret.TouchEvent.TOUCH_MOVE,this.onMove,this);
+        this.addEventListener(egret.TouchEvent.TOUCH_END,this.moveEnd,this);
     }
 
-    private food:Food;
-    private stageW:number;
-    private stageH:number;
-    private radius:number = 30;
+    
+    private color = 0x4c8dae;
+
+    private onEat (){
+        this.removeChild(this.food);
+        this.snake.afterEat(this.food.color);
+        this.createFood();
+    }
 
     private createFood():void{
         //随机坐标
@@ -145,10 +160,46 @@ class Main extends egret.DisplayObjectContainer {
 
         this.food = new Food(tmpx,tmpy,this.radius);
         this.addChild(this.food);
+
+        
+
     }
 
-    
 
+    private timer:egret.Timer;
+    private during:number = 40;
+    private moveEvent:egret.TouchEvent;
+    private head:egret.Shape;
+
+    private move(e:egret.TouchEvent){
+        this.snake.move(e, this.during);
+    }
+
+    private onMove(e: egret.TouchEvent) {
+        this.moveEvent = e;
+        if (this.timer == null) {
+            this.timer = new egret.Timer(this.during);
+            this.timer.addEventListener(egret.TimerEvent.TIMER, this.onTimer, this);
+            this.timer.start();
+        }
+    }
+    private moveEnd(e: egret.TouchEvent) {
+        if (this.timer != null) {
+            this.timer.stop();
+            this.timer = null;
+        }
+    }
+    private onTimer(e: egret.TimerEvent) {
+        this.head = this.snake.getHead();
+        if (this.hit(this.head, this.food))
+            this.onEat();
+        this.snake.move(this.moveEvent, this.during);
+    }
+
+    private hit(a, b) {
+        return (new egret.Rectangle(a.x + this.snake.x, a.y + this.snake.y, a.width, a.height))
+            .intersects(new egret.Rectangle(b.x, b.y, b.width, b.height));
+    }
 }
 
 

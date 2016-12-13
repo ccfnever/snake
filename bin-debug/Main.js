@@ -31,6 +31,8 @@ var Main = (function (_super) {
     function Main() {
         _super.call(this);
         this.radius = 30;
+        this.color = 0x4c8dae;
+        this.during = 40;
         this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
     }
     var d = __define,c=Main,p=c.prototype;
@@ -110,8 +112,17 @@ var Main = (function (_super) {
         bg.graphics.endFill();
         this.addChild(bg);
         this.createFood();
+        this.snake = new Snake(this.stageW * 0.5, this.stageH * 0.5, this.radius, 0x33ffcc);
+        this.addChild(this.snake);
         this.touchEnabled = true;
-        // this.addEventListener(egret.TouchEvent.TOUCH_TAP,this.move,this);
+        this.addEventListener(egret.TouchEvent.TOUCH_TAP, this.move, this);
+        this.addEventListener(egret.TouchEvent.TOUCH_MOVE, this.onMove, this);
+        this.addEventListener(egret.TouchEvent.TOUCH_END, this.moveEnd, this);
+    };
+    p.onEat = function () {
+        this.removeChild(this.food);
+        this.snake.afterEat(this.food.color);
+        this.createFood();
     };
     p.createFood = function () {
         //随机坐标
@@ -119,6 +130,33 @@ var Main = (function (_super) {
         var tmpy = Math.random() * (this.stageH - this.radius * 2);
         this.food = new Food(tmpx, tmpy, this.radius);
         this.addChild(this.food);
+    };
+    p.move = function (e) {
+        this.snake.move(e, this.during);
+    };
+    p.onMove = function (e) {
+        this.moveEvent = e;
+        if (this.timer == null) {
+            this.timer = new egret.Timer(this.during);
+            this.timer.addEventListener(egret.TimerEvent.TIMER, this.onTimer, this);
+            this.timer.start();
+        }
+    };
+    p.moveEnd = function (e) {
+        if (this.timer != null) {
+            this.timer.stop();
+            this.timer = null;
+        }
+    };
+    p.onTimer = function (e) {
+        this.head = this.snake.getHead();
+        if (this.hit(this.head, this.food))
+            this.onEat();
+        this.snake.move(this.moveEvent, this.during);
+    };
+    p.hit = function (a, b) {
+        return (new egret.Rectangle(a.x + this.snake.x, a.y + this.snake.y, a.width, a.height))
+            .intersects(new egret.Rectangle(b.x, b.y, b.width, b.height));
     };
     return Main;
 }(egret.DisplayObjectContainer));
