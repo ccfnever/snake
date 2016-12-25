@@ -46,11 +46,12 @@ var Snake = (function (_super) {
         eyeRight.addChild(eyeBlcak2);
         this.head.addChild(eyeLeft);
         this.head.addChild(eyeRight);
-        this.head.x = 0;
-        this.head.y = 0;
+        this.head.x = this.head.width / 2;
+        this.head.y = this.head.height / 2;
         this.head.anchorOffsetX = this.head.width / 2;
         this.head.anchorOffsetY = this.head.height / 2;
         this.radius = r;
+        // this.head.rotation = 300
         this.x = x;
         this.y = y;
         this.bodyList.push(this.head);
@@ -60,7 +61,7 @@ var Snake = (function (_super) {
     p.afterEat = function (color) {
         var node = new egret.Shape();
         node.graphics.beginFill(color);
-        node.graphics.drawCircle(this.radius, this.radius, this.radius);
+        node.graphics.drawCircle(0, 0, this.radius);
         node.graphics.endFill();
         // node.anchorOffsetX = node.width/2;
         // node.anchorOffsetY = node.height/2;

@@ -13,8 +13,9 @@ class Snake extends egret.Sprite{
         //蛇头容器
         this.head = new egret.Sprite();
         this.head.graphics.beginFill(color);
-        this.head.graphics.drawCircle(r,r,r);        
+        this.head.graphics.drawCircle(r,r,r);              
         this.head.graphics.endFill();
+
 
         let eyeLeft:egret.Sprite = new egret.Sprite();  //左眼
         let eyeRight:egret.Sprite = new egret.Sprite(); //右眼
@@ -65,12 +66,12 @@ class Snake extends egret.Sprite{
         
 
 
-        this.head.x = 0;
-        this.head.y = 0;
+        this.head.x = this.head.width/2;
+        this.head.y = this.head.height/2;
         this.head.anchorOffsetX = this.head.width/2;
         this.head.anchorOffsetY = this.head.height/2;
         this.radius = r;
-
+        // this.head.rotation = 300
         this.x = x;
         this.y = y;
 
@@ -85,7 +86,7 @@ class Snake extends egret.Sprite{
 
         let node:egret.Shape = new egret.Shape();
         node.graphics.beginFill(color);
-        node.graphics.drawCircle(this.radius,this.radius,this.radius);
+        node.graphics.drawCircle(0,0,this.radius);
         node.graphics.endFill();
         // node.anchorOffsetX = node.width/2;
         // node.anchorOffsetY = node.height/2;

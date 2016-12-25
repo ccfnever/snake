@@ -5126,7 +5126,7 @@ var egret;
                 listener.call(null, value);
             }
             else {
-                egret.$warn(1004, functionName);
+                egret.$warn(1050, functionName);
             }
         }
         egret.ExternalInterface = NativeExternalInterface;
@@ -5398,6 +5398,7 @@ var egret;
                     //this.audio.load();
                     _this.$play();
                 };
+                this.$volume = 1;
                 audio.addEventListener("ended", this.onPlayEnd);
                 this.audio = audio;
             }
@@ -5413,6 +5414,7 @@ var egret;
                 catch (e) {
                 }
                 finally {
+                    this.audio.volume = this.$volume;
                     this.audio.play();
                 }
             };
@@ -5439,9 +5441,7 @@ var egret;
                  * @inheritDoc
                  */
                 ,function () {
-                    if (!this.audio)
-                        return 1;
-                    return this.audio.volume;
+                    return this.$volume;
                 }
                 /**
                  * @inheritDoc
@@ -5451,6 +5451,7 @@ var egret;
                         egret.$error(1036);
                         return;
                     }
+                    this.$volume = value;
                     if (!this.audio)
                         return;
                     this.audio.volume = value;
@@ -6819,7 +6820,7 @@ var egret;
              * @returns {boolean}
              */
             p.isNetUrl = function (url) {
-                return url.indexOf("http://") != -1 || url.indexOf("HTTP://") != -1;
+                return url.indexOf("http://") != -1 || url.indexOf("HTTP://") != -1 || url.indexOf("https://") != -1 || url.indexOf("HTTPS://") != -1;
             };
             /**
              * @private
@@ -6982,7 +6983,7 @@ var egret;
              * @returns {boolean}
              */
             p.isNetUrl = function (url) {
-                return url.indexOf("http://") != -1 || url.indexOf("HTTP://") != -1;
+                return url.indexOf("http://") != -1 || url.indexOf("HTTP://") != -1 || url.indexOf("https://") != -1 || url.indexOf("HTTPS://") != -1;
             };
             /**
              * @private

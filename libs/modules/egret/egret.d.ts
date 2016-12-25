@@ -1048,7 +1048,7 @@ declare namespace egret {
          * @private
          * 沿着显示列表向下传递标志量，非容器直接设置自身的flag，此方法会在 DisplayObjectContainer 中被覆盖。
          */
-        $propagateFlagsDown(flags: number): void;
+        $propagateFlagsDown(flags: number, cachedBreak?: boolean): void;
         /**
          * @private
          * 是否含有多个标志量其中之一。
@@ -2591,7 +2591,7 @@ declare namespace egret {
         /**
          * @private
          */
-        $propagateFlagsDown(flags: sys.DisplayObjectFlags): void;
+        $propagateFlagsDown(flags: sys.DisplayObjectFlags, cachedBreak?: boolean): void;
         /**
          * @language en_US
          * Returns the number of children of this object.
@@ -10014,6 +10014,9 @@ declare namespace egret.sys {
      */
     let $ticker: SystemTicker;
 }
+/**
+ * @private
+ */
 declare let egret_stages: egret.Stage[];
 declare namespace egret.sys {
     /**
@@ -10758,7 +10761,7 @@ declare namespace egret {
         /**
          * @private
          */
-        renderGraphics(node: sys.GraphicsNode, context: CanvasRenderingContext2D, forHitTest?: boolean): void;
+        renderGraphics(node: sys.GraphicsNode, context: CanvasRenderingContext2D, forHitTest?: boolean): number;
         private renderPath(path, context);
         private renderGroup(groupNode, context);
         /**
