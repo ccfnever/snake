@@ -114,9 +114,10 @@ class Main extends egret.DisplayObjectContainer {
 
     private food:Food;
     private snake:Snake;
+    private steeringWheel:Controller;
     private stageW:number;
     private stageH:number;
-    private radius:number = 30;
+    private radius:number = 15;
 
 
     /**
@@ -124,22 +125,49 @@ class Main extends egret.DisplayObjectContainer {
      * Create a game scene
      */
     private createGameScene():void {
-        
         this.stageW = this.stage.stageWidth;
         this.stageH = this.stage.stageHeight;
 
         let bg = new egret.Shape();
-        bg.graphics.beginFill(0x333333);
+        let lineSpace = 25;
+        let xLineLength = this.stageW / lineSpace;
+        let yLineLength = this.stageH / lineSpace;
+        bg.graphics.beginFill(0xf2f2f2);
+        bg.graphics.lineStyle(1,0xe3e3e3);
+
+        for( let i = 0; i < xLineLength;i++){
+            bg.graphics.moveTo(0,lineSpace * i);
+            bg.graphics.lineTo(this.stageW,lineSpace * i)
+        }
+        for( let j = 0; j < xLineLength;j++){
+            bg.graphics.moveTo(lineSpace * j,0);
+            bg.graphics.lineTo(lineSpace * j,this.stageH)
+        }
+        // bg.graphics.moveTo(0,0);
+        // bg.graphics.lineTo(this.stageW,this.stageH)
+
         bg.graphics.drawRect(0,0,this.stageW,this.stageH);
+
         bg.graphics.endFill();
         this.addChild(bg);
         
+        //创建食物
         this.createFood();
 
+        //创建蛇
         this.snake = new Snake(this.stageW * 0.5, this.stageH * 0.5, this.radius,0x33ffcc);
         this.addChild(this.snake);
+
+        //创建方向控制器
+        this.steeringWheel = new Controller(100,0x000000);
+        this.addChild(this.steeringWheel);
+        this.steeringWheel.x = 60;
+		this.steeringWheel.y = this.stage.stageHeight - (100 * 3);
+
+   
+
         this.touchEnabled = true;
-        this.addEventListener(egret.TouchEvent.TOUCH_TAP,this.move,this);
+        this.addEventListener(egret.TouchEvent.TOUCH_BEGIN,this.move,this);
         this.addEventListener(egret.TouchEvent.TOUCH_MOVE,this.onMove,this);
         this.addEventListener(egret.TouchEvent.TOUCH_END,this.moveEnd,this);
     }

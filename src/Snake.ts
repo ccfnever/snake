@@ -78,8 +78,6 @@ class Snake extends egret.Sprite{
         this.bodyList.push(this.head);
         this.addChild(this.bodyList[this.bodyList.length - 1]);
         this.setChildIndex(this.bodyList[this.bodyList.length -1 ],-999);
-
-
     }
 
     public afterEat(color:number){
@@ -101,7 +99,7 @@ class Snake extends egret.Sprite{
         this.setChildIndex(this.bodyList[this.bodyList.length - 1], 0);
     }
 
-    public speed:number = 20;
+    public speed:number = 15;
     public move(e:egret.TouchEvent,during:number){
         let mx = e.stageX;
         let my = e.stageY;
@@ -163,10 +161,25 @@ class Snake extends egret.Sprite{
             }
         }
 
-        
+        //撞墙啦
+        if(this.getTheWall(this.head.x,this.head.y)){  
+            alert('撞墙啦');
+            window.location.reload()
+        }
     }
 
     public getHead() {
         return this.bodyList[0];
+    }
+
+    //撞墙检测
+    public getTheWall(x:number,y:number):boolean{
+
+        if(Math.abs(x) >= this.x - this.radius || Math.abs(y) >= this.y - this.radius){
+            return true;
+        }else{
+            return false;
+        }
+        
     }
 }

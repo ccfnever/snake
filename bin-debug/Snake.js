@@ -3,7 +3,7 @@ var Snake = (function (_super) {
     function Snake(x, y, r, color) {
         _super.call(this);
         this.bodyList = [];
-        this.speed = 20;
+        this.speed = 15;
         this.init(x, y, r, color);
     }
     var d = __define,c=Snake,p=c.prototype;
@@ -129,9 +129,23 @@ var Snake = (function (_super) {
                 tween.to({ x: tmpx, y: tmpy }, during);
             }
         }
+        //撞墙啦
+        if (this.getTheWall(this.head.x, this.head.y)) {
+            alert('撞墙啦');
+            window.location.reload();
+        }
     };
     p.getHead = function () {
         return this.bodyList[0];
+    };
+    //撞墙检测
+    p.getTheWall = function (x, y) {
+        if (Math.abs(x) >= this.x - this.radius || Math.abs(y) >= this.y - this.radius) {
+            return true;
+        }
+        else {
+            return false;
+        }
     };
     return Snake;
 }(egret.Sprite));
