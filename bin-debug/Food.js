@@ -22,9 +22,6 @@ var Food = (function (_super) {
         this.y = y;
         this.addChild(this.food);
     };
-    p.onEat = function () {
-        this.parent.removeChild(this);
-    };
     /**
      * 食物颜色
      */

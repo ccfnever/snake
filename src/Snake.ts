@@ -1,19 +1,26 @@
 class Snake extends egret.Sprite{
-	public constructor(x: number, y: number, r: number, color: number) {
+	public constructor(x: number, y: number) {
         super();
-        this.init(x, y, r, color);
+        this.init(x, y);
     }
     //蛇头
     private head:egret.Sprite;
     private radius:number;
+    private color:number;
+    private insideColor:number;
     private bodyList:egret.Shape[] = [];
 
-    private init(x:number,y:number,r:number,color:number){
+    private init(x:number,y:number){
+
+        //获取GameConfig配置
+        this.radius = GameConfig.snakeSize;
+        this.color = GameConfig.snakeColor;
+        this.insideColor = GameConfig.snakeInsideColor;
 
         //蛇头容器
         this.head = new egret.Sprite();
-        this.head.graphics.beginFill(color);
-        this.head.graphics.drawCircle(r,r,r);              
+        this.head.graphics.beginFill(this.color);
+        this.head.graphics.drawCircle(this.radius,this.radius,this.radius);              
         this.head.graphics.endFill();
 
 
@@ -25,31 +32,31 @@ class Snake extends egret.Sprite{
         let eyeWhite2:egret.Shape = new egret.Shape();
 
         eyeLeft.graphics.beginFill(0xffffff);
-        eyeLeft.graphics.drawCircle(r/2.5,r/1.2,r/2);
+        eyeLeft.graphics.drawCircle(this.radius/2.5,this.radius/1.2,this.radius/2);
         eyeLeft.graphics.endFill();
         eyeLeft.x = 0;
         eyeLeft.y = 0;
 
         eyeRight.graphics.beginFill(0xffffff);
-        eyeRight.graphics.drawCircle(r*1.6,r/1.2,r/2);
+        eyeRight.graphics.drawCircle(this.radius*1.6,this.radius/1.2,this.radius/2);
         eyeRight.graphics.endFill();
     
         eyeRight.y = 0;
         
         eyeBlcak.graphics.beginFill(0x000000);
-        eyeBlcak.graphics.drawCircle(r/2.5,r/1.2,r/3.5)
+        eyeBlcak.graphics.drawCircle(this.radius/2.5,this.radius/1.2,this.radius/3.5)
         eyeBlcak.graphics.endFill();
 
         eyeBlcak2.graphics.beginFill(0x000000);
-        eyeBlcak2.graphics.drawCircle(r*1.6,r/1.2,r/3.5)
+        eyeBlcak2.graphics.drawCircle(this.radius*1.6,this.radius/1.2,this.radius/3.5)
         eyeBlcak2.graphics.endFill();
 
         eyeWhite.graphics.beginFill(0xffffff);
-        eyeWhite.graphics.drawCircle(r/3,r/1.5,r/7)
+        eyeWhite.graphics.drawCircle(this.radius/3,this.radius/1.5,this.radius/7)
         eyeWhite.graphics.endFill();
 
         eyeWhite2.graphics.beginFill(0xffffff);
-        eyeWhite2.graphics.drawCircle(r*1.6,r/1.5,r/7)
+        eyeWhite2.graphics.drawCircle(this.radius*1.6,this.radius/1.5,this.radius/7)
         eyeWhite2.graphics.endFill();
 
 
@@ -70,7 +77,6 @@ class Snake extends egret.Sprite{
         this.head.y = this.head.height/2;
         this.head.anchorOffsetX = this.head.width/2;
         this.head.anchorOffsetY = this.head.height/2;
-        this.radius = r;
         // this.head.rotation = 300
         this.x = x;
         this.y = y;
@@ -78,16 +84,23 @@ class Snake extends egret.Sprite{
         this.bodyList.push(this.head);
         this.addChild(this.bodyList[this.bodyList.length - 1]);
         this.setChildIndex(this.bodyList[this.bodyList.length -1 ],-999);
+
+        //初始带5个节点
+        for(let i = 0; i<5;i++){
+            this.afterEat(1)
+        }
+        
     }
 
     public afterEat(color:number){
 
         let node:egret.Shape = new egret.Shape();
-        node.graphics.beginFill(color);
+        node.graphics.beginFill(this.color);
         node.graphics.drawCircle(0,0,this.radius);
+        node.graphics.beginFill(this.insideColor);
+        node.graphics.drawCircle(0,0,this.radius/2);
         node.graphics.endFill();
-        // node.anchorOffsetX = node.width/2;
-        // node.anchorOffsetY = node.height/2;
+
         //指定新增节点的位置在蛇身节点list的最后一个节点，也就是蛇尾的一个坐标偏移（这里可以随便指定合理的位置即可）
         node.x = this.bodyList[this.bodyList.length - 1].x - 1;
         node.y = this.bodyList[this.bodyList.length - 1].y - 1;
@@ -100,29 +113,33 @@ class Snake extends egret.Sprite{
     }
 
     public speed:number = 15;
-    public move(e:egret.TouchEvent,during:number){
+    public move(e:egret.TouchEvent,during:number,angle:number){
         let mx = e.stageX;
         let my = e.stageY;
         let hx = this.x + this.bodyList[0].x;
         let hy = this.y + this.bodyList[0].y;
         let tween:egret.Tween;
 
-       
-
         let relativeX = mx - hx;
         let relativeY = hy - my;
-
-        let R = Math.atan2(relativeX,relativeY);
-        R = 180 * R / Math.PI;
+       
+        // if (angle){
+        //     var angle = Math.atan2(relativeX,relativeY);
+        // }
+        
+        console.log(angle)
+        
+        // angle = 180 * angle / Math.PI;
         
         for (let i = this.bodyList.length - 1; i > 0; i--) {
             tween = egret.Tween.get(this.bodyList[i]);
             tween.to({ x: this.bodyList[i - 1].x, y: this.bodyList[i - 1].y }, during);
         }
 
-         //设置蛇头朝向
-        this.head.rotation = R
-
+         //设置蛇头朝向         
+        this.head.rotation = 180 -angle;
+         
+        
         //设置当前缓动对象为蛇头
         tween = egret.Tween.get(this.bodyList[0]);
         let tmpx, tmpy;
@@ -130,36 +147,11 @@ class Snake extends egret.Sprite{
             //位置相同
             return;
         }
-        if (hx != mx) {
-            //非垂直
-
-            //斜率
-            let mk = (my - hy) / (mx - hx);
-            //角度
-            let mangle = Math.atan(mk);
-            if (mx < hx) {
-                //左边
-                tmpx = this.bodyList[0].x - this.speed * Math.cos(mangle);
-                tmpy = this.bodyList[0].y - this.speed * Math.sin(mangle);
-                tween.to({ x: tmpx, y: tmpy }, during);
-            } else {
-                //右边
-                tmpx = this.bodyList[0].x + this.speed * Math.cos(mangle);
-                tmpy = this.bodyList[0].y + this.speed * Math.sin(mangle);
-                tween.to({ x: tmpx, y: tmpy }, during);
-            }
-        } else {
-            //垂直
-            if (mx < hx) {
-                //水平向左
-                tmpx = this.bodyList[0].x - this.speed;
-                tween.to({ x: tmpx, y: tmpy }, during);
-            } else {
-                //水平向右
-                tmpx = this.bodyList[0].x + this.speed;
-                tween.to({ x: tmpx, y: tmpy }, during);
-            }
-        }
+     
+        tmpx = this.bodyList[0].x + Math.sin( angle * Math.PI/180 ) * this.speed;
+        tmpy = this.bodyList[0].y + Math.cos( angle * Math.PI/180 ) * this.speed;
+        // console.log(tmpx,tmpy)
+        tween.to({ x: tmpx, y: tmpy }, during);
 
         //撞墙啦
         if(this.getTheWall(this.head.x,this.head.y)){  

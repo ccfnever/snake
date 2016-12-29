@@ -33,14 +33,14 @@ class Main extends egret.DisplayObjectContainer {
      * 加载进度界面
      * Process interface loading
      */
-    private loadingView:LoadingUI;
+    private loadingView: LoadingUI;
 
     public constructor() {
         super();
         this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
     }
 
-    private onAddToStage(event:egret.Event) {
+    private onAddToStage(event: egret.Event) {
         //设置加载进度界面
         //Config to load process interface
         this.loadingView = new LoadingUI();
@@ -56,7 +56,7 @@ class Main extends egret.DisplayObjectContainer {
      * 配置文件加载完成,开始预加载preload资源组。
      * configuration file loading is completed, start to pre-load the preload resource group
      */
-    private onConfigComplete(event:RES.ResourceEvent):void {
+    private onConfigComplete(event: RES.ResourceEvent): void {
         RES.removeEventListener(RES.ResourceEvent.CONFIG_COMPLETE, this.onConfigComplete, this);
         RES.addEventListener(RES.ResourceEvent.GROUP_COMPLETE, this.onResourceLoadComplete, this);
         RES.addEventListener(RES.ResourceEvent.GROUP_LOAD_ERROR, this.onResourceLoadError, this);
@@ -69,7 +69,7 @@ class Main extends egret.DisplayObjectContainer {
      * preload资源组加载完成
      * Preload resource group is loaded
      */
-    private onResourceLoadComplete(event:RES.ResourceEvent):void {
+    private onResourceLoadComplete(event: RES.ResourceEvent): void {
         if (event.groupName == "preload") {
             this.stage.removeChild(this.loadingView);
             RES.removeEventListener(RES.ResourceEvent.GROUP_COMPLETE, this.onResourceLoadComplete, this);
@@ -84,7 +84,7 @@ class Main extends egret.DisplayObjectContainer {
      * 资源组加载出错
      *  The resource group loading failed
      */
-    private onItemLoadError(event:RES.ResourceEvent):void {
+    private onItemLoadError(event: RES.ResourceEvent): void {
         console.warn("Url:" + event.resItem.url + " has failed to load");
     }
 
@@ -92,7 +92,7 @@ class Main extends egret.DisplayObjectContainer {
      * 资源组加载出错
      *  The resource group loading failed
      */
-    private onResourceLoadError(event:RES.ResourceEvent):void {
+    private onResourceLoadError(event: RES.ResourceEvent): void {
         //TODO
         console.warn("Group:" + event.groupName + " has failed to load");
         //忽略加载失败的项目
@@ -104,124 +104,138 @@ class Main extends egret.DisplayObjectContainer {
      * preload资源组加载进度
      * Loading process of preload resource group
      */
-    private onResourceProgress(event:RES.ResourceEvent):void {
+    private onResourceProgress(event: RES.ResourceEvent): void {
         if (event.groupName == "preload") {
             this.loadingView.setProgress(event.itemsLoaded, event.itemsTotal);
         }
     }
 
-    private textfield:egret.TextField;
+    private food: Food;
+    private snake: Snake;
+    private steeringWheel: Controller;
+    private stageW: number;
+    private stageH: number;
+    private radius: number = 15;
 
-    private food:Food;
-    private snake:Snake;
-    private steeringWheel:Controller;
-    private stageW:number;
-    private stageH:number;
-    private radius:number = 15;
 
 
     /**
      * 创建游戏场景
      * Create a game scene
      */
-    private createGameScene():void {
+    private createGameScene(): void {
         this.stageW = this.stage.stageWidth;
         this.stageH = this.stage.stageHeight;
+        // GameConfig.initData()
+        console.log(GameConfig.snakeSize)
 
+        //创建背景和网格
         let bg = new egret.Shape();
         let lineSpace = 25;
         let xLineLength = this.stageW / lineSpace;
         let yLineLength = this.stageH / lineSpace;
         bg.graphics.beginFill(0xf2f2f2);
-        bg.graphics.lineStyle(1,0xe3e3e3);
+        bg.graphics.lineStyle(1, 0xe3e3e3);
 
-        for( let i = 0; i < xLineLength;i++){
-            bg.graphics.moveTo(0,lineSpace * i);
-            bg.graphics.lineTo(this.stageW,lineSpace * i)
+        for (let i = 0; i < xLineLength; i++) {
+            bg.graphics.moveTo(0, lineSpace * i);
+            bg.graphics.lineTo(this.stageW, lineSpace * i)
         }
-        for( let j = 0; j < xLineLength;j++){
-            bg.graphics.moveTo(lineSpace * j,0);
-            bg.graphics.lineTo(lineSpace * j,this.stageH)
+        for (let j = 0; j < xLineLength; j++) {
+            bg.graphics.moveTo(lineSpace * j, 0);
+            bg.graphics.lineTo(lineSpace * j, this.stageH)
         }
         // bg.graphics.moveTo(0,0);
         // bg.graphics.lineTo(this.stageW,this.stageH)
 
-        bg.graphics.drawRect(0,0,this.stageW,this.stageH);
+        bg.graphics.drawRect(0, 0, this.stageW, this.stageH);
 
         bg.graphics.endFill();
         this.addChild(bg);
-        
+
         //创建食物
         this.createFood();
 
+        //创建方向控制器
+        this.steeringWheel = new Controller(100, 0x000000);
+        this.addChild(this.steeringWheel);
+
+        GameConfig.stY = this.stage.stageHeight - (100 * 3);
+        this.steeringWheel.x = GameConfig.stX;
+        this.steeringWheel.y = GameConfig.stY;
+
         //创建蛇
-        this.snake = new Snake(this.stageW * 0.5, this.stageH * 0.5, this.radius,0x33ffcc);
+        this.snake = new Snake(this.stageW * 0.5, this.stageH * 0.5);
         this.addChild(this.snake);
 
-        //创建方向控制器
-        this.steeringWheel = new Controller(100,0x000000);
-        this.addChild(this.steeringWheel);
-        this.steeringWheel.x = 60;
-		this.steeringWheel.y = this.stage.stageHeight - (100 * 3);
-
-   
-
         this.touchEnabled = true;
-        this.addEventListener(egret.TouchEvent.TOUCH_BEGIN,this.move,this);
-        this.addEventListener(egret.TouchEvent.TOUCH_MOVE,this.onMove,this);
-        this.addEventListener(egret.TouchEvent.TOUCH_END,this.moveEnd,this);
+        // this.addEventListener(egret.TouchEvent.TOUCH_BEGIN,this.move,this);
+        this.addEventListener(egret.TouchEvent.TOUCH_MOVE, this.onMove, this);
+        this.addEventListener(egret.TouchEvent.TOUCH_END, this.moveEnd, this);
     }
 
-    
-    private color = 0x4c8dae;
 
-    private onEat (){
+
+
+
+    private onEat() {
         this.removeChild(this.food);
         this.snake.afterEat(this.food.color);
         this.createFood();
     }
 
-    private createFood():void{
+    private createFood(): void {
         //随机坐标
         let tmpx = Math.random() * (this.stageW - this.radius * 2);
         let tmpy = Math.random() * (this.stageH - this.radius * 2);
 
-        this.food = new Food(tmpx,tmpy,this.radius);
+        this.food = new Food(tmpx, tmpy, this.radius);
         this.addChild(this.food);
 
-        
 
     }
 
 
-    private timer:egret.Timer;
-    private during:number = 40;
-    private moveEvent:egret.TouchEvent;
-    private head:egret.Shape;
+    private snakeTimer: egret.Timer;
+    private stTimer:egret.Timer;
+    private during: number = 40;
+    private moveEvent: egret.TouchEvent;
+    private head: egret.Shape;
+    private angle: number;
 
-    private move(e:egret.TouchEvent){
-        this.snake.move(e, this.during);
-    }
+    // private move(e:egret.TouchEvent){
+    //     this.snake.move(e, this.during,this.steeringWheel.angle);
+    //     this.steeringWheel.controllerMove(e)
+    // }
 
     private onMove(e: egret.TouchEvent) {
         this.moveEvent = e;
-        if (this.timer == null) {
-            this.timer = new egret.Timer(this.during);
-            this.timer.addEventListener(egret.TimerEvent.TIMER, this.onTimer, this);
-            this.timer.start();
+        if (this.snakeTimer == null) {
+            this.snakeTimer = new egret.Timer(this.during);
+            this.snakeTimer.addEventListener(egret.TimerEvent.TIMER, this.onSnakeTimer, this);
+            this.snakeTimer.start();
+        }
+        if(this.stTimer == null){
+            this.stTimer = new egret.Timer(this.during);
+            this.stTimer.addEventListener(egret.TimerEvent.TIMER, this.onStTimer, this);
+            this.stTimer.start();
         }
     }
+
     private moveEnd(e: egret.TouchEvent) {
-        if (this.timer != null) {
-            this.timer.stop();
-            this.timer = null;
-        }
+        this.steeringWheel.reset()
+        this.stTimer.stop();
+        this.stTimer = null;
     }
-    private onTimer(e: egret.TimerEvent) {
+
+    private onSnakeTimer(e: egret.TimerEvent) {
         this.head = this.snake.getHead();
         if (this.hit(this.head, this.food))
             this.onEat();
-        this.snake.move(this.moveEvent, this.during);
+        this.snake.move(this.moveEvent, this.during, this.steeringWheel.angle);
+    }
+    private onStTimer(e: egret.TimerEvent) {
+        this.steeringWheel.controllerMove(this.moveEvent);
     }
 
     private hit(a, b) {

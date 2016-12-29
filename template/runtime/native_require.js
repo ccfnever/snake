@@ -10,6 +10,8 @@ var game_file_list = [
 	"libs/modules/tween/tween.js",
 	"bin-debug/Controller.js",
 	"bin-debug/Food.js",
+	"bin-debug/GameConfig.js",
+	"bin-debug/GameData.js",
 	"bin-debug/LoadingUI.js",
 	"bin-debug/Main.js",
 	"bin-debug/Snake.js",

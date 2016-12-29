@@ -31,7 +31,6 @@ var Main = (function (_super) {
     function Main() {
         _super.call(this);
         this.radius = 15;
-        this.color = 0x4c8dae;
         this.during = 40;
         this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
     }
@@ -106,6 +105,9 @@ var Main = (function (_super) {
     p.createGameScene = function () {
         this.stageW = this.stage.stageWidth;
         this.stageH = this.stage.stageHeight;
+        // GameConfig.initData()
+        console.log(GameConfig.snakeSize);
+        //创建背景和网格
         var bg = new egret.Shape();
         var lineSpace = 25;
         var xLineLength = this.stageW / lineSpace;
@@ -127,16 +129,17 @@ var Main = (function (_super) {
         this.addChild(bg);
         //创建食物
         this.createFood();
-        //创建蛇
-        this.snake = new Snake(this.stageW * 0.5, this.stageH * 0.5, this.radius, 0x33ffcc);
-        this.addChild(this.snake);
         //创建方向控制器
         this.steeringWheel = new Controller(100, 0x000000);
         this.addChild(this.steeringWheel);
-        this.steeringWheel.x = 60;
-        this.steeringWheel.y = this.stage.stageHeight - (100 * 3);
+        GameConfig.stY = this.stage.stageHeight - (100 * 3);
+        this.steeringWheel.x = GameConfig.stX;
+        this.steeringWheel.y = GameConfig.stY;
+        //创建蛇
+        this.snake = new Snake(this.stageW * 0.5, this.stageH * 0.5);
+        this.addChild(this.snake);
         this.touchEnabled = true;
-        this.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.move, this);
+        // this.addEventListener(egret.TouchEvent.TOUCH_BEGIN,this.move,this);
         this.addEventListener(egret.TouchEvent.TOUCH_MOVE, this.onMove, this);
         this.addEventListener(egret.TouchEvent.TOUCH_END, this.moveEnd, this);
     };
@@ -152,28 +155,36 @@ var Main = (function (_super) {
         this.food = new Food(tmpx, tmpy, this.radius);
         this.addChild(this.food);
     };
-    p.move = function (e) {
-        this.snake.move(e, this.during);
-    };
+    // private move(e:egret.TouchEvent){
+    //     this.snake.move(e, this.during,this.steeringWheel.angle);
+    //     this.steeringWheel.controllerMove(e)
+    // }
     p.onMove = function (e) {
         this.moveEvent = e;
-        if (this.timer == null) {
-            this.timer = new egret.Timer(this.during);
-            this.timer.addEventListener(egret.TimerEvent.TIMER, this.onTimer, this);
-            this.timer.start();
+        if (this.snakeTimer == null) {
+            this.snakeTimer = new egret.Timer(this.during);
+            this.snakeTimer.addEventListener(egret.TimerEvent.TIMER, this.onSnakeTimer, this);
+            this.snakeTimer.start();
+        }
+        if (this.stTimer == null) {
+            this.stTimer = new egret.Timer(this.during);
+            this.stTimer.addEventListener(egret.TimerEvent.TIMER, this.onStTimer, this);
+            this.stTimer.start();
         }
     };
     p.moveEnd = function (e) {
-        if (this.timer != null) {
-            this.timer.stop();
-            this.timer = null;
-        }
+        this.steeringWheel.reset();
+        this.stTimer.stop();
+        this.stTimer = null;
     };
-    p.onTimer = function (e) {
+    p.onSnakeTimer = function (e) {
         this.head = this.snake.getHead();
         if (this.hit(this.head, this.food))
             this.onEat();
-        this.snake.move(this.moveEvent, this.during);
+        this.snake.move(this.moveEvent, this.during, this.steeringWheel.angle);
+    };
+    p.onStTimer = function (e) {
+        this.steeringWheel.controllerMove(this.moveEvent);
     };
     p.hit = function (a, b) {
         return (new egret.Rectangle(a.x + this.snake.x, a.y + this.snake.y, a.width, a.height))

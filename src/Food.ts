@@ -36,7 +36,7 @@ class Food extends egret.Sprite{
 
 	}
 
-	public onEat():void{
-		this.parent.removeChild(this);
-	}
+	// public onEat():void{
+	// 	this.parent.removeChild(this);
+	// }
 }
