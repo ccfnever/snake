@@ -53,7 +53,7 @@ class Controller extends egret.Sprite{
 			distance:number;	//摇杆跟方向盘中心点的距离
 
 		distance = Math.sqrt( relativeX * relativeX + relativeY * relativeY);
-		console.log(distance)
+		// console.log(distance)
 
 		this.angle = Math.atan2(relativeX,relativeY);
 		this.angle = 180 * this.angle / Math.PI;

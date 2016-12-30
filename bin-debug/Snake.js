@@ -62,10 +62,10 @@ var Snake = (function (_super) {
         this.setChildIndex(this.bodyList[this.bodyList.length - 1], -999);
         //初始带5个节点
         for (var i = 0; i < 5; i++) {
-            this.afterEat(1);
+            this.afterEat();
         }
     };
-    p.afterEat = function (color) {
+    p.afterEat = function () {
         var node = new egret.Shape();
         node.graphics.beginFill(this.color);
         node.graphics.drawCircle(0, 0, this.radius);
@@ -92,7 +92,7 @@ var Snake = (function (_super) {
         // if (angle){
         //     var angle = Math.atan2(relativeX,relativeY);
         // }
-        console.log(angle);
+        // console.log(angle)
         // angle = 180 * angle / Math.PI;
         for (var i = this.bodyList.length - 1; i > 0; i--) {
             tween = egret.Tween.get(this.bodyList[i]);

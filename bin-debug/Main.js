@@ -30,7 +30,7 @@ var Main = (function (_super) {
     __extends(Main, _super);
     function Main() {
         _super.call(this);
-        this.radius = 15;
+        this.foodList = [];
         this.during = 40;
         this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
     }
@@ -128,7 +128,9 @@ var Main = (function (_super) {
         bg.graphics.endFill();
         this.addChild(bg);
         //创建食物
-        this.createFood();
+        for (var i = 0; i < GameConfig.foodNmu; i++) {
+            this.createFood();
+        }
         //创建方向控制器
         this.steeringWheel = new Controller(100, 0x000000);
         this.addChild(this.steeringWheel);
@@ -143,17 +145,22 @@ var Main = (function (_super) {
         this.addEventListener(egret.TouchEvent.TOUCH_MOVE, this.onMove, this);
         this.addEventListener(egret.TouchEvent.TOUCH_END, this.moveEnd, this);
     };
-    p.onEat = function () {
-        this.removeChild(this.food);
-        this.snake.afterEat(this.food.color);
+    p.onEat = function (i) {
+        // egret.Tween.get(this.foodList[i]).to({ x: this.head.x + this.snake.x, y: this.head.y + this.snake.y, alpha: 0 }, 100)
+        this.removeChild(this.foodList[i]);
+        this.foodList.splice(i, 1);
+        this.snake.afterEat();
         this.createFood();
     };
     p.createFood = function () {
+        console.log(11111);
         //随机坐标
-        var tmpx = Math.random() * (this.stageW - this.radius * 2);
-        var tmpy = Math.random() * (this.stageH - this.radius * 2);
-        this.food = new Food(tmpx, tmpy, this.radius);
-        this.addChild(this.food);
+        var tmpx = Math.random() * (this.stageW - 20);
+        var tmpy = Math.random() * (this.stageH - 20);
+        var food = new Food(tmpx, tmpy);
+        this.foodList.push(food);
+        console.log(this.foodList, this.foodList.length);
+        this.addChild(this.foodList[this.foodList.length - 1]);
     };
     // private move(e:egret.TouchEvent){
     //     this.snake.move(e, this.during,this.steeringWheel.angle);
@@ -174,20 +181,26 @@ var Main = (function (_super) {
     };
     p.moveEnd = function (e) {
         this.steeringWheel.reset();
-        this.stTimer.stop();
-        this.stTimer = null;
+        if (this.stTimer) {
+            this.stTimer.stop();
+            this.stTimer = null;
+        }
     };
     p.onSnakeTimer = function (e) {
         this.head = this.snake.getHead();
-        if (this.hit(this.head, this.food))
-            this.onEat();
+        // console.log(this.foodList[0])
+        for (var i = this.foodList.length - 1; i >= 0; i--) {
+            if (this.hit(this.head, this.foodList[i])) {
+                this.onEat(i);
+            }
+        }
         this.snake.move(this.moveEvent, this.during, this.steeringWheel.angle);
     };
     p.onStTimer = function (e) {
         this.steeringWheel.controllerMove(this.moveEvent);
     };
     p.hit = function (a, b) {
-        return (new egret.Rectangle(a.x + this.snake.x, a.y + this.snake.y, a.width, a.height))
+        return (new egret.Rectangle(a.x + this.snake.x - a.width, a.y + this.snake.y - a.width, a.width * 2, a.height * 2))
             .intersects(new egret.Rectangle(b.x, b.y, b.width, b.height));
     };
     return Main;

@@ -10,7 +10,8 @@ class GameConfig {
 
 	public static snakeSpeed:number = 15;				//蛇运动速度
 
-	public static foodSize:number = 10;
+	public static foodSizeList:number[] = [3,3,3,3,5,10];		//食物大小
+	public static foodNmu:number = 100; 	//食物数量
 
 	public static stX:number = 60;
 	public static stY:number;

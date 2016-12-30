@@ -87,12 +87,12 @@ class Snake extends egret.Sprite{
 
         //初始带5个节点
         for(let i = 0; i<5;i++){
-            this.afterEat(1)
+            this.afterEat()
         }
         
     }
 
-    public afterEat(color:number){
+    public afterEat(){
 
         let node:egret.Shape = new egret.Shape();
         node.graphics.beginFill(this.color);
@@ -127,7 +127,7 @@ class Snake extends egret.Sprite{
         //     var angle = Math.atan2(relativeX,relativeY);
         // }
         
-        console.log(angle)
+        // console.log(angle)
         
         // angle = 180 * angle / Math.PI;
         

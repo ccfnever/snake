@@ -33,7 +33,7 @@ var Controller = (function (_super) {
         var relativeY = e.stageY - sY;
         var newX, newY, distance; //摇杆跟方向盘中心点的距离
         distance = Math.sqrt(relativeX * relativeX + relativeY * relativeY);
-        console.log(distance);
+        // console.log(distance)
         this.angle = Math.atan2(relativeX, relativeY);
         this.angle = 180 * this.angle / Math.PI;
         distance = distance < this.radius / 2 ? distance : this.radius / 2;
