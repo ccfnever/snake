@@ -110,14 +110,14 @@ class Main extends egret.DisplayObjectContainer {
         }
     }
 
-    private food: Food;
     private foodList: Food[] = [];
     private snake: Snake;
     private steeringWheel: Controller;
     private stageW: number;
     private stageH: number;
 
-
+    private infiniteMode:egret.Bitmap;
+    private limited:egret.Bitmap;
 
     /**
      * 创建游戏场景
@@ -145,13 +145,14 @@ class Main extends egret.DisplayObjectContainer {
             bg.graphics.moveTo(lineSpace * j, 0);
             bg.graphics.lineTo(lineSpace * j, this.stageH)
         }
-        // bg.graphics.moveTo(0,0);
-        // bg.graphics.lineTo(this.stageW,this.stageH)
-
         bg.graphics.drawRect(0, 0, this.stageW, this.stageH);
 
         bg.graphics.endFill();
         this.addChild(bg);
+
+
+        
+
 
         //创建食物
         for(let i = 0;i<GameConfig.foodNmu;i++){
@@ -174,6 +175,12 @@ class Main extends egret.DisplayObjectContainer {
         // this.addEventListener(egret.TouchEvent.TOUCH_BEGIN,this.move,this);
         this.addEventListener(egret.TouchEvent.TOUCH_MOVE, this.onMove, this);
         this.addEventListener(egret.TouchEvent.TOUCH_END, this.moveEnd, this);
+
+        //创建游戏开始入口
+         var img:egret.Bitmap = new egret.Bitmap();
+        img.texture = RES.getRes("limited_png");
+
+        this.addChild(img);
     }
 
 
@@ -187,7 +194,6 @@ class Main extends egret.DisplayObjectContainer {
     }
 
     private createFood(): void {
-        console.log(11111)
         //随机坐标
         let tmpx = Math.random() * (this.stageW - 20);
         let tmpy = Math.random() * (this.stageH - 20);
@@ -195,7 +201,7 @@ class Main extends egret.DisplayObjectContainer {
         let food = new Food(tmpx, tmpy);
 
         this.foodList.push(food);
-        console.log(this.foodList,this.foodList.length)
+        // console.log(this.foodList,this.foodList.length)
         this.addChild(this.foodList[this.foodList.length - 1]);
 
 
@@ -251,6 +257,7 @@ class Main extends egret.DisplayObjectContainer {
         this.steeringWheel.controllerMove(this.moveEvent);
     }
 
+    //碰撞检测
     private hit(a, b) {
         return (new egret.Rectangle(a.x + this.snake.x - a.width, a.y + this.snake.y - a.width, a.width * 2, a.height * 2))
             .intersects(new egret.Rectangle(b.x, b.y, b.width, b.height));

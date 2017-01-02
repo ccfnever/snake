@@ -122,8 +122,6 @@ var Main = (function (_super) {
             bg.graphics.moveTo(lineSpace * j, 0);
             bg.graphics.lineTo(lineSpace * j, this.stageH);
         }
-        // bg.graphics.moveTo(0,0);
-        // bg.graphics.lineTo(this.stageW,this.stageH)
         bg.graphics.drawRect(0, 0, this.stageW, this.stageH);
         bg.graphics.endFill();
         this.addChild(bg);
@@ -144,6 +142,10 @@ var Main = (function (_super) {
         // this.addEventListener(egret.TouchEvent.TOUCH_BEGIN,this.move,this);
         this.addEventListener(egret.TouchEvent.TOUCH_MOVE, this.onMove, this);
         this.addEventListener(egret.TouchEvent.TOUCH_END, this.moveEnd, this);
+        //创建游戏开始入口
+        var img = new egret.Bitmap();
+        img.texture = RES.getRes("limited_png");
+        this.addChild(img);
     };
     p.onEat = function (i) {
         // egret.Tween.get(this.foodList[i]).to({ x: this.head.x + this.snake.x, y: this.head.y + this.snake.y, alpha: 0 }, 100)
@@ -153,13 +155,12 @@ var Main = (function (_super) {
         this.createFood();
     };
     p.createFood = function () {
-        console.log(11111);
         //随机坐标
         var tmpx = Math.random() * (this.stageW - 20);
         var tmpy = Math.random() * (this.stageH - 20);
         var food = new Food(tmpx, tmpy);
         this.foodList.push(food);
-        console.log(this.foodList, this.foodList.length);
+        // console.log(this.foodList,this.foodList.length)
         this.addChild(this.foodList[this.foodList.length - 1]);
     };
     // private move(e:egret.TouchEvent){
@@ -199,6 +200,7 @@ var Main = (function (_super) {
     p.onStTimer = function (e) {
         this.steeringWheel.controllerMove(this.moveEvent);
     };
+    //碰撞检测
     p.hit = function (a, b) {
         return (new egret.Rectangle(a.x + this.snake.x - a.width, a.y + this.snake.y - a.width, a.width * 2, a.height * 2))
             .intersects(new egret.Rectangle(b.x, b.y, b.width, b.height));
