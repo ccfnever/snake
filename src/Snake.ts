@@ -5,7 +5,7 @@ class Snake extends egret.Sprite{
     }
     //蛇头
     private head:egret.Sprite;
-    private radius:number;
+    public radius:number;
     private color:number;
     private insideColor:number;
     private bodyList:egret.Shape[] = [];

@@ -14,8 +14,10 @@ var GameConfig = (function () {
     GameConfig.snakeSpeed = 15; //蛇运动速度
     GameConfig.foodSizeList = [3, 3, 3, 5, 10]; //食物大小
     GameConfig.foodNmu = 100; //食物数量
-    GameConfig.stX = 60;
+    GameConfig.stX = 60; //方向盘
     GameConfig.stColor = 0x000000;
+    GameConfig.limited = false;
+    GameConfig.limitedTime = 120;
     return GameConfig;
 }());
 egret.registerClass(GameConfig,'GameConfig');

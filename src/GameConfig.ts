@@ -13,9 +13,12 @@ class GameConfig {
 	public static foodSizeList:number[] = [3,3,3,5,10];		//食物大小
 	public static foodNmu:number = 100; 	//食物数量
 
-	public static stX:number = 60;
+	public static stX:number = 60;		//方向盘
 	public static stY:number;
 	public static stColor:number = 0x000000; 
+
+	public static limited:boolean = false;
+	public static limitedTime:number = 120;
 	public static initData(){
 		
 	}

@@ -62,7 +62,7 @@ class Main extends egret.DisplayObjectContainer {
         RES.addEventListener(RES.ResourceEvent.GROUP_LOAD_ERROR, this.onResourceLoadError, this);
         RES.addEventListener(RES.ResourceEvent.GROUP_PROGRESS, this.onResourceProgress, this);
         RES.addEventListener(RES.ResourceEvent.ITEM_LOAD_ERROR, this.onItemLoadError, this);
-        RES.loadGroup("preload");
+        RES.loadGroup("snake");
     }
 
     /**
@@ -70,7 +70,7 @@ class Main extends egret.DisplayObjectContainer {
      * Preload resource group is loaded
      */
     private onResourceLoadComplete(event: RES.ResourceEvent): void {
-        if (event.groupName == "preload") {
+        if (event.groupName == "snake") {
             this.stage.removeChild(this.loadingView);
             RES.removeEventListener(RES.ResourceEvent.GROUP_COMPLETE, this.onResourceLoadComplete, this);
             RES.removeEventListener(RES.ResourceEvent.GROUP_LOAD_ERROR, this.onResourceLoadError, this);
@@ -116,9 +116,12 @@ class Main extends egret.DisplayObjectContainer {
     private stageW: number;
     private stageH: number;
 
+    //游戏选择面板
     private infiniteMode:egret.Bitmap;
     private limited:egret.Bitmap;
+    private chooseLayer:egret.Sprite;
 
+    private score:egret.Sprite;
     /**
      * 创建游戏场景
      * Create a game scene
@@ -127,7 +130,7 @@ class Main extends egret.DisplayObjectContainer {
         this.stageW = this.stage.stageWidth;
         this.stageH = this.stage.stageHeight;
         // GameConfig.initData()
-        console.log(GameConfig.snakeSize)
+        // console.log(GameConfig.snakeSize)
 
         //创建背景和网格
         let bg = new egret.Shape();
@@ -151,14 +154,41 @@ class Main extends egret.DisplayObjectContainer {
         this.addChild(bg);
 
 
+        //创建游戏开始入口
+        this.chooseLayer = new egret.Sprite();
+        this.chooseLayer.width = this.stageW;
+        this.chooseLayer.height = this.stageH;
+
+        // this.chooseLayer.addChild(bg);
         
+        this.infiniteMode = new egret.Bitmap();
+        this.infiniteMode.texture = RES.getRes("infinite_png");
+        this.infiniteMode.x = this.stageW/2 - this.infiniteMode.width - 50;
+        this.infiniteMode.y = this.stageH/2 - this.infiniteMode.height/1.7;
+        this.chooseLayer.addChild(this.infiniteMode);
 
+        this.limited = new egret.Bitmap();
+        this.limited.texture = RES.getRes("limited_png");
+        this.limited.x = this.stageW/2 + 50;
+        this.limited.y = this.stageH/2 - this.limited.height/1.7;
+        this.chooseLayer.addChild(this.limited);
 
+        this.infiniteMode.touchEnabled = true;
+        this.limited.touchEnabled = true;
+        this.infiniteMode.addEventListener(egret.TouchEvent.TOUCH_TAP,this.gameStart,this)
+        this.limited.addEventListener(egret.TouchEvent.TOUCH_TAP,this.gameStart,this)
+
+        this.addChild(this.chooseLayer);
+        
+    }
+
+    private gameStart(e:egret.TouchEvent){
+        
+        this.removeChild(this.chooseLayer)
         //创建食物
         for(let i = 0;i<GameConfig.foodNmu;i++){
             this.createFood();
         }
-
         //创建方向控制器
         this.steeringWheel = new Controller(100, 0x000000);
         this.addChild(this.steeringWheel);
@@ -171,18 +201,34 @@ class Main extends egret.DisplayObjectContainer {
         this.snake = new Snake(this.stageW * 0.5, this.stageH * 0.5);
         this.addChild(this.snake);
 
+        //创建得分面板
+        this.score = new egret.Sprite();
+        let scoreBg = new egret.Bitmap();
+        scoreBg.texture = RES.getRes('score_png');
+        this.score.width = scoreBg.width;
+        this.score.height = scoreBg.height;
+
+        this.score.x = this.stageW - this.score.width - 20;
+        this.score.y = 20;
+        this.score.addChild(scoreBg);
+        
+        GameData.scoreText = new egret.TextField();
+        GameData.scoreText.text = GameData.score + '';
+        GameData.scoreText.textColor = 0xffffff;
+        GameData.scoreText.x = this.score.width / 2.3;
+        GameData.scoreText.y = this.score.height / 3;
+        GameData.scoreText.size = this.score.height / 3 + 2; 
+        this.score.addChild(GameData.scoreText)
+        this.addChild(this.score)
+
+        //添加事件
         this.touchEnabled = true;
         // this.addEventListener(egret.TouchEvent.TOUCH_BEGIN,this.move,this);
         this.addEventListener(egret.TouchEvent.TOUCH_MOVE, this.onMove, this);
         this.addEventListener(egret.TouchEvent.TOUCH_END, this.moveEnd, this);
 
-        //创建游戏开始入口
-         var img:egret.Bitmap = new egret.Bitmap();
-        img.texture = RES.getRes("limited_png");
-
-        this.addChild(img);
+        this.onMove(e)
     }
-
 
     private onEat(i:number) {
         // egret.Tween.get(this.foodList[i]).to({ x: this.head.x + this.snake.x, y: this.head.y + this.snake.y, alpha: 0 }, 100)
@@ -190,9 +236,25 @@ class Main extends egret.DisplayObjectContainer {
         this.foodList.splice(i,1);
         this.snake.afterEat();
         this.createFood();
-
+        this.compute(this.foodList[i].width);
+        
     }
 
+    //计算分数
+    private compute(size:number){
+        switch(size){
+            case 6:
+                GameData.score++;
+                break;
+            case 10:
+                GameData.score += 3;
+                break;
+            case 20:
+                GameData.score += 5;
+        }
+        
+        GameData.scoreText.text = GameData.score + '';
+    }
     private createFood(): void {
         //随机坐标
         let tmpx = Math.random() * (this.stageW - 20);
@@ -215,10 +277,7 @@ class Main extends egret.DisplayObjectContainer {
     private head: egret.Shape;
     private angle: number;
 
-    // private move(e:egret.TouchEvent){
-    //     this.snake.move(e, this.during,this.steeringWheel.angle);
-    //     this.steeringWheel.controllerMove(e)
-    // }
+
 
     private onMove(e: egret.TouchEvent) {
         this.moveEvent = e;
@@ -245,7 +304,8 @@ class Main extends egret.DisplayObjectContainer {
 
     private onSnakeTimer(e: egret.TimerEvent) {
         this.head = this.snake.getHead();
-        // console.log(this.foodList[0])
+        
+        //检测食物碰撞
         for (let i = this.foodList.length - 1; i >= 0; i--) {
             if (this.hit(this.head, this.foodList[i])) {
                 this.onEat(i);

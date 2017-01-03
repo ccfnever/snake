@@ -55,14 +55,14 @@ var Main = (function (_super) {
         RES.addEventListener(RES.ResourceEvent.GROUP_LOAD_ERROR, this.onResourceLoadError, this);
         RES.addEventListener(RES.ResourceEvent.GROUP_PROGRESS, this.onResourceProgress, this);
         RES.addEventListener(RES.ResourceEvent.ITEM_LOAD_ERROR, this.onItemLoadError, this);
-        RES.loadGroup("preload");
+        RES.loadGroup("snake");
     };
     /**
      * preload资源组加载完成
      * Preload resource group is loaded
      */
     p.onResourceLoadComplete = function (event) {
-        if (event.groupName == "preload") {
+        if (event.groupName == "snake") {
             this.stage.removeChild(this.loadingView);
             RES.removeEventListener(RES.ResourceEvent.GROUP_COMPLETE, this.onResourceLoadComplete, this);
             RES.removeEventListener(RES.ResourceEvent.GROUP_LOAD_ERROR, this.onResourceLoadError, this);
@@ -106,7 +106,7 @@ var Main = (function (_super) {
         this.stageW = this.stage.stageWidth;
         this.stageH = this.stage.stageHeight;
         // GameConfig.initData()
-        console.log(GameConfig.snakeSize);
+        // console.log(GameConfig.snakeSize)
         //创建背景和网格
         var bg = new egret.Shape();
         var lineSpace = 25;
@@ -125,6 +125,29 @@ var Main = (function (_super) {
         bg.graphics.drawRect(0, 0, this.stageW, this.stageH);
         bg.graphics.endFill();
         this.addChild(bg);
+        //创建游戏开始入口
+        this.chooseLayer = new egret.Sprite();
+        this.chooseLayer.width = this.stageW;
+        this.chooseLayer.height = this.stageH;
+        // this.chooseLayer.addChild(bg);
+        this.infiniteMode = new egret.Bitmap();
+        this.infiniteMode.texture = RES.getRes("infinite_png");
+        this.infiniteMode.x = this.stageW / 2 - this.infiniteMode.width - 50;
+        this.infiniteMode.y = this.stageH / 2 - this.infiniteMode.height / 1.7;
+        this.chooseLayer.addChild(this.infiniteMode);
+        this.limited = new egret.Bitmap();
+        this.limited.texture = RES.getRes("limited_png");
+        this.limited.x = this.stageW / 2 + 50;
+        this.limited.y = this.stageH / 2 - this.limited.height / 1.7;
+        this.chooseLayer.addChild(this.limited);
+        this.infiniteMode.touchEnabled = true;
+        this.limited.touchEnabled = true;
+        this.infiniteMode.addEventListener(egret.TouchEvent.TOUCH_TAP, this.gameStart, this);
+        this.limited.addEventListener(egret.TouchEvent.TOUCH_TAP, this.gameStart, this);
+        this.addChild(this.chooseLayer);
+    };
+    p.gameStart = function (e) {
+        this.removeChild(this.chooseLayer);
         //创建食物
         for (var i = 0; i < GameConfig.foodNmu; i++) {
             this.createFood();
@@ -138,14 +161,29 @@ var Main = (function (_super) {
         //创建蛇
         this.snake = new Snake(this.stageW * 0.5, this.stageH * 0.5);
         this.addChild(this.snake);
+        //创建得分面板
+        this.score = new egret.Sprite();
+        var scoreBg = new egret.Bitmap();
+        scoreBg.texture = RES.getRes('score_png');
+        this.score.width = scoreBg.width;
+        this.score.height = scoreBg.height;
+        this.score.x = this.stageW - this.score.width - 20;
+        this.score.y = 20;
+        this.score.addChild(scoreBg);
+        GameData.scoreText = new egret.TextField();
+        GameData.scoreText.text = GameData.score + '';
+        GameData.scoreText.textColor = 0xffffff;
+        GameData.scoreText.x = this.score.width / 2.3;
+        GameData.scoreText.y = this.score.height / 3;
+        GameData.scoreText.size = this.score.height / 3 + 2;
+        this.score.addChild(GameData.scoreText);
+        this.addChild(this.score);
+        //添加事件
         this.touchEnabled = true;
         // this.addEventListener(egret.TouchEvent.TOUCH_BEGIN,this.move,this);
         this.addEventListener(egret.TouchEvent.TOUCH_MOVE, this.onMove, this);
         this.addEventListener(egret.TouchEvent.TOUCH_END, this.moveEnd, this);
-        //创建游戏开始入口
-        var img = new egret.Bitmap();
-        img.texture = RES.getRes("limited_png");
-        this.addChild(img);
+        this.onMove(e);
     };
     p.onEat = function (i) {
         // egret.Tween.get(this.foodList[i]).to({ x: this.head.x + this.snake.x, y: this.head.y + this.snake.y, alpha: 0 }, 100)
@@ -153,6 +191,21 @@ var Main = (function (_super) {
         this.foodList.splice(i, 1);
         this.snake.afterEat();
         this.createFood();
+        this.compute(this.foodList[i].width);
+    };
+    //计算分数
+    p.compute = function (size) {
+        switch (size) {
+            case 6:
+                GameData.score++;
+                break;
+            case 10:
+                GameData.score += 3;
+                break;
+            case 20:
+                GameData.score += 5;
+        }
+        GameData.scoreText.text = GameData.score + '';
     };
     p.createFood = function () {
         //随机坐标
@@ -163,10 +216,6 @@ var Main = (function (_super) {
         // console.log(this.foodList,this.foodList.length)
         this.addChild(this.foodList[this.foodList.length - 1]);
     };
-    // private move(e:egret.TouchEvent){
-    //     this.snake.move(e, this.during,this.steeringWheel.angle);
-    //     this.steeringWheel.controllerMove(e)
-    // }
     p.onMove = function (e) {
         this.moveEvent = e;
         if (this.snakeTimer == null) {
@@ -189,7 +238,7 @@ var Main = (function (_super) {
     };
     p.onSnakeTimer = function (e) {
         this.head = this.snake.getHead();
-        // console.log(this.foodList[0])
+        //检测食物碰撞
         for (var i = this.foodList.length - 1; i >= 0; i--) {
             if (this.hit(this.head, this.foodList[i])) {
                 this.onEat(i);
