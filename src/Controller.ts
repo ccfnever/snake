@@ -43,7 +43,7 @@ class Controller extends egret.Sprite{
 
 		//方向盘中心点 
 		let sX = 60 + this.radius;
-		let sY = 836 + this.radius;
+		let sY = GameConfig.stY + this.radius;
 		
 		let relativeX = e.stageX - sX;
 		let relativeY = e.stageY - sY;

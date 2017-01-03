@@ -158,6 +158,7 @@ var Main = (function (_super) {
         GameConfig.stY = this.stage.stageHeight - (100 * 3);
         this.steeringWheel.x = GameConfig.stX;
         this.steeringWheel.y = GameConfig.stY;
+        console.log(GameConfig.stY);
         //创建蛇
         this.snake = new Snake(this.stageW * 0.5, this.stageH * 0.5);
         this.addChild(this.snake);
