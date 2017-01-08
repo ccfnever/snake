@@ -27,6 +27,7 @@ var Controller = (function (_super) {
         // let tween:egret.Tween;
         // egret.Tween.get(this.insideSt).to({x:e.stageX,y:e.stageY},300);
         //方向盘中心点 
+        
         var sX = GameConfig.stX + this.radius;
         var sY = GameConfig.stY + this.radius;
         var relativeX = (e ? e.stageX : 0) - sX;

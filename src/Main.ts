@@ -196,7 +196,6 @@ class Main extends egret.DisplayObjectContainer {
         
         this.steeringWheel.x = GameConfig.stX;
         this.steeringWheel.y = GameConfig.stY;
-        console.log(this.steeringWheel.x,this.steeringWheel.y)
 
         //创建蛇
         this.snake = new Snake(this.stageW * 0.5, this.stageH * 0.5);
