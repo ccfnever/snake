@@ -3,7 +3,6 @@ var Food = (function (_super) {
     /**
      * @param x 横坐标
      * @param y 纵坐标
-     * @param r 半径
      *  */
     function Food(x, y) {
         _super.call(this);
@@ -24,10 +23,6 @@ var Food = (function (_super) {
         this.addChild(this.food);
         this.setChildIndex(this.food, -1);
     };
-    /**
-     * 食物颜色
-     */
-    Food.colorList = [0x70f3ff, 0xff461f, 0x00bc12, 0x21a675, 0x4c221b, 0xbf242a, 0x161823, 0xffa400];
     return Food;
 }(egret.Sprite));
 egret.registerClass(Food,'Food');

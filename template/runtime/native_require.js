@@ -8,6 +8,7 @@ var game_file_list = [
 	"libs/modules/game/game.native.js",
 	"libs/modules/res/res.js",
 	"libs/modules/tween/tween.js",
+	"libs/modules/eui/eui.js",
 	"bin-debug/Controller.js",
 	"bin-debug/Food.js",
 	"bin-debug/GameConfig.js",
@@ -49,7 +50,7 @@ egret_native.egretStart = function () {
         //----auto option start----
 		entryClassName: "Main",
 		frameRate: 30,
-		scaleMode: "showAll",
+		scaleMode: "fixedNarrow",
 		contentWidth: 1920,
 		contentHeight: 1080,
 		showPaintRect: false,

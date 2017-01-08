@@ -27,10 +27,10 @@ var Controller = (function (_super) {
         // let tween:egret.Tween;
         // egret.Tween.get(this.insideSt).to({x:e.stageX,y:e.stageY},300);
         //方向盘中心点 
-        var sX = 60 + this.radius;
-        var sY = 836 + this.radius;
-        var relativeX = e.stageX - sX;
-        var relativeY = e.stageY - sY;
+        var sX = GameConfig.stX + this.radius;
+        var sY = GameConfig.stY + this.radius;
+        var relativeX = (e ? e.stageX : 0) - sX;
+        var relativeY = (e ? e.stageY : 0) - sY;
         var newX, newY, distance; //摇杆跟方向盘中心点的距离
         distance = Math.sqrt(relativeX * relativeX + relativeY * relativeY);
         // console.log(distance)

@@ -4,7 +4,7 @@ class Snake extends egret.Sprite{
         this.init(x, y);
     }
     //蛇头
-    private head:egret.Sprite;
+    public head:egret.Sprite;
     public radius:number;
     private color:number;
     private insideColor:number;
@@ -112,10 +112,9 @@ class Snake extends egret.Sprite{
         this.setChildIndex(this.bodyList[this.bodyList.length - 1], 0);
     }
 
-    public speed:number = 15;
     public move(e:egret.TouchEvent,during:number,angle:number){
-        let mx = e.stageX;
-        let my = e.stageY;
+        let mx = e?e.stageX:0;
+        let my = e?e.stageY:0;
         let hx = this.x + this.bodyList[0].x;
         let hy = this.y + this.bodyList[0].y;
         let tween:egret.Tween;
@@ -148,16 +147,12 @@ class Snake extends egret.Sprite{
             return;
         }
      
-        tmpx = this.bodyList[0].x + Math.sin( angle * Math.PI/180 ) * this.speed;
-        tmpy = this.bodyList[0].y + Math.cos( angle * Math.PI/180 ) * this.speed;
+        tmpx = this.bodyList[0].x + Math.sin( angle * Math.PI/180 ) * GameConfig.snakeSpeed;
+        tmpy = this.bodyList[0].y + Math.cos( angle * Math.PI/180 ) * GameConfig.snakeSpeed;
         // console.log(tmpx,tmpy)
         tween.to({ x: tmpx, y: tmpy }, during);
 
-        //撞墙啦
-        if(this.getTheWall(this.head.x,this.head.y)){  
-            alert('撞墙啦');
-            window.location.reload()
-        }
+    
     }
 
     public getHead() {

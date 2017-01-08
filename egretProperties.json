@@ -20,6 +20,9 @@
 		},
 		{
 			"name": "tween"
+		},
+		{
+			"name":"eui"
 		}
 	]
 }

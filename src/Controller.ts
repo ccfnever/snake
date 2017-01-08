@@ -22,6 +22,7 @@ class Controller extends egret.Sprite{
 		this.steeringWheel.y = r;
 		this.radius = r;
 		this.angle = 0;
+		
 		// this.x = 30;
 		// this.y = this.stage.stageHeight - (r * 3 + 30);
 
@@ -42,11 +43,11 @@ class Controller extends egret.Sprite{
 		
 
 		//方向盘中心点 
-		let sX = 60 + this.radius;
-		let sY = 836 + this.radius;
+		let sX = GameConfig.stX + this.radius;
+		let sY = GameConfig.stY + this.radius;
 		
-		let relativeX = e.stageX - sX;
-		let relativeY = e.stageY - sY;
+		let relativeX = (e?e.stageX:0) - sX;
+		let relativeY = (e?e.stageY:0) - sY;
 
 		let newX:number,	
 			newY:number,

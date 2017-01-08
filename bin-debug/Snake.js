@@ -3,7 +3,6 @@ var Snake = (function (_super) {
     function Snake(x, y) {
         _super.call(this);
         this.bodyList = [];
-        this.speed = 15;
         this.init(x, y);
     }
     var d = __define,c=Snake,p=c.prototype;
@@ -82,8 +81,8 @@ var Snake = (function (_super) {
         this.setChildIndex(this.bodyList[this.bodyList.length - 1], 0);
     };
     p.move = function (e, during, angle) {
-        var mx = e.stageX;
-        var my = e.stageY;
+        var mx = e ? e.stageX : 0;
+        var my = e ? e.stageY : 0;
         var hx = this.x + this.bodyList[0].x;
         var hy = this.y + this.bodyList[0].y;
         var tween;
@@ -107,15 +106,10 @@ var Snake = (function (_super) {
             //位置相同
             return;
         }
-        tmpx = this.bodyList[0].x + Math.sin(angle * Math.PI / 180) * this.speed;
-        tmpy = this.bodyList[0].y + Math.cos(angle * Math.PI / 180) * this.speed;
+        tmpx = this.bodyList[0].x + Math.sin(angle * Math.PI / 180) * GameConfig.snakeSpeed;
+        tmpy = this.bodyList[0].y + Math.cos(angle * Math.PI / 180) * GameConfig.snakeSpeed;
         // console.log(tmpx,tmpy)
         tween.to({ x: tmpx, y: tmpy }, during);
-        //撞墙啦
-        if (this.getTheWall(this.head.x, this.head.y)) {
-            alert('撞墙啦');
-            window.location.reload();
-        }
     };
     p.getHead = function () {
         return this.bodyList[0];
